@@ -1,20 +1,20 @@
 const express = require('express');
-   const router = express.Router();
-   const supabase = require('../config/supabaseClient');
+const router = express.Router();
+const supabase = require('../config/supabaseClient');
 
-   // SIGN UP
-   router.post('/signup', async (req, res) => {
-     const { email, password, name } = req.body;
-     const { data, error } = await supabase.auth.signUp({
-       email,
-       password,
-       options: { data: { name } }
-     });
-     if (error) return res.status(400).json({ error: error.message });
-     res.status(200).json({ message: 'Signup successful! Check your email to confirm.', user: data.user });
-   });
+// SIGN UP
+router.post('/signup', async (req, res) => {
+  const { email, password, name } = req.body;
+  const { data, error } = await supabase.auth.signUp({
+    email,
+    password,
+    options: { data: { name } }
+  });
+  if (error) return res.status(400).json({ error: error.message });
+  res.status(200).json({ message: 'Signup successful! Check your email to confirm.', user: data.user });
+});
 
-   // LOGIN
+// LOGIN
 router.post('/login', async (req, res) => {
   const { email, password } = req.body;
   const { data, error } = await supabase.auth.signInWithPassword({ email, password });
@@ -37,4 +37,4 @@ router.post('/forgot-password', async (req, res) => {
   res.status(200).json({ message: 'Password reset email sent' });
 });
 
-   module.exports = router;
+module.exports = router;
