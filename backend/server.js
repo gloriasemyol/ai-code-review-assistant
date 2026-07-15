@@ -23,6 +23,9 @@ app.get('/', (req, res) => {
   res.send('AI Code Review Assistant API is running...');
 });
 
+const reviewRoutes = require('./routes/reviews');
+   app.use('/api/reviews', reviewRoutes);
+
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
