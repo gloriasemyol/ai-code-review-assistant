@@ -1,7 +1,12 @@
 "use client";
-import { useState } from "react";
+import { useRouter } from "next/navigation";
+import { useAuth } from "../context/AuthContext";
+import { useState, useEffect } from "react";
 
 export default function NewReview() {
+  const { user, loading: authLoading } = useAuth();
+  const router = useRouter();
+
   const [projectName, setProjectName] = useState("");
   const [code, setCode] = useState("");
   const [fileName, setFileName] = useState("");
@@ -9,7 +14,14 @@ export default function NewReview() {
   const [message, setMessage] = useState("");
   const [loading, setLoading] = useState(false);
 
-  // Runs when user selects a file
+  // Auth Guard: Redirect to login if not logged in after authentication loading completes
+  useEffect(() => {
+    if (!authLoading && !user) {
+      router.push("/login");
+    }
+  }, [user, authLoading, router]);
+
+  // Runs when user selects a file locally
   const handleFileUpload = (e) => {
     const file = e.target.files[0];
     if (!file) return;
@@ -27,6 +39,12 @@ export default function NewReview() {
       setMessage("Please paste code or upload a file first.");
       return;
     }
+    
+    if (!user) {
+      setMessage("❌ Error: You must be logged in to submit a project.");
+      return;
+    }
+
     setLoading(true);
     setMessage("");
 
@@ -35,7 +53,7 @@ export default function NewReview() {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          user_id: "512a783e-2ff1-4074-8ed0-0641eabfe018", // Your real user UUID
+          user_id: user.id, // Dynamically maps to the active user's authenticated ID
           project_name: projectName || "Untitled Project",
           code_content: code,
           file_name: fileName || "pasted-code.txt",
@@ -56,6 +74,14 @@ export default function NewReview() {
       setLoading(false);
     }
   };
+
+  // Prevent flashing component content while authentication state resolves
+  if (authLoading) {
+    return <p className="text-center mt-10">Checking authentication...</p>;
+  }
+
+  // Prevent rendering if user is missing and page is navigating away
+  if (!user) return null;
 
   return (
     <div className="max-w-2xl mx-auto mt-10 p-6">

@@ -117,4 +117,11 @@ router.get('/:user_id', async (req, res) => {
   res.status(200).json(data);
 });
 
+router.delete('/:id', async (req, res) => {
+  const { id } = req.params;
+  const { error } = await supabase.from('projects').delete().eq('id', id);
+  if (error) return res.status(400).json({ error: error.message });
+  res.status(200).json({ message: 'Project deleted' });
+});
+
 module.exports = router;
