@@ -1,12 +1,22 @@
 'use client';
+import { useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
 import LoadingSpinner from '../components/LoadingSpinner';
+import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 
 export default function DashboardPage() {
   const { user, loading } = useAuth();
+  const router = useRouter();
+
+  useEffect(() => {
+    if (!loading && !user) {
+      router.push('/login'); // Not logged in? Go to login!
+    }
+  }, [user, loading, router]);
 
   if (loading) return <LoadingSpinner />;
+  if (!user) return null; // Prevent UI flicker before redirect
 
   return (
     <div className="max-w-4xl mx-auto p-8">
