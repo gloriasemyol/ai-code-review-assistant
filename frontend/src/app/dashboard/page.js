@@ -1,8 +1,10 @@
 "use client";
+import { API_URL } from "../config";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { useAuth } from "../context/AuthContext";
+import LoadingSpinner from "../components/LoadingSpinner";
 
 export default function Dashboard() {
   const { user, loading: authLoading } = useAuth();
@@ -23,7 +25,7 @@ export default function Dashboard() {
 
   const fetchProjects = async () => {
     try {
-      const res = await fetch(`http://localhost:5000/api/projects/${user.id}`);
+      const res = await fetch(`${API_URL}/api/projects/${user.id}`);
       const data = await res.json();
       if (!res.ok) throw new Error(data.error);
       setProjects(data);
@@ -37,7 +39,7 @@ export default function Dashboard() {
   const handleDelete = async (projectId) => {
     if (!confirm("Delete this review? This cannot be undone.")) return;
     try {
-      const res = await fetch(`http://localhost:5000/api/projects/${projectId}`, {
+      const res = await fetch(`${API_URL}/api/projects/${projectId}`, {
         method: "DELETE",
       });
       if (!res.ok) throw new Error("Failed to delete");
@@ -53,7 +55,7 @@ export default function Dashboard() {
     return matchesSearch && matchesLanguage;
   });
 
-  if (authLoading || loading) return <p className="text-center mt-10">Loading...</p>;
+  if (authLoading || loading) return <LoadingSpinner />;
   if (error) return <p className="text-center mt-10 text-red-600">Error: {error}</p>;
 
   return (

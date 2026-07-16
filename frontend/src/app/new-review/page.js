@@ -1,4 +1,5 @@
 "use client";
+import { API_URL } from "../config";
 import { useRouter } from "next/navigation";
 import { useAuth } from "../context/AuthContext";
 import { useState, useEffect } from "react";
@@ -49,7 +50,7 @@ export default function NewReview() {
     setMessage("");
 
     try {
-      const res = await fetch("http://localhost:5000/api/projects", {
+      const res = await fetch(`${API_URL}/api/projects`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({

@@ -2,6 +2,7 @@
 import ReactMarkdown from "react-markdown";
 import { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
+import LoadingSpinner from "../../components/LoadingSpinner";
 
 const severityColor = {
   High: "bg-red-100 text-red-700 border-red-300",
@@ -46,7 +47,7 @@ export default function ReviewResults() {
     }
   };
 
-  if (loading) return <p className="text-center mt-10">Loading results...</p>;
+  if (loading) return <LoadingSpinner />;
   if (error) return <p className="text-center mt-10 text-red-600">Error: {error}</p>;
 
   return (
