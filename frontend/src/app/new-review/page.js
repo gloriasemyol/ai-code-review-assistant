@@ -14,12 +14,10 @@ export default function NewReviewPage() {
     
     setAnalyzing(true);
 
-    // Simulate analysis delay
     setTimeout(() => {
       setAnalyzing(false);
       const mockReviewId = Math.floor(100000 + Math.random() * 900000);
       
-      // Save to localStorage history
       const newReview = {
         id: mockReviewId,
         date: new Date().toLocaleDateString(undefined, {
@@ -33,10 +31,13 @@ export default function NewReviewPage() {
         codeSnippet: code
       };
 
+      // 1. Save to the global history list
       const existingHistory = JSON.parse(localStorage.getItem('codeReviews') || '[]');
       localStorage.setItem('codeReviews', JSON.stringify([newReview, ...existingHistory]));
 
-      // Redirect to results
+      // 2. Save this specific review's code separately so the details page can read it easily
+      localStorage.setItem(`review_code_${mockReviewId}`, code);
+
       router.push(`/review/${mockReviewId}`);
     }, 1500);
   };
