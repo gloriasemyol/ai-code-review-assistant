@@ -1,4 +1,5 @@
 "use client";
+import ReactMarkdown from "react-markdown";
 import { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
 
@@ -96,6 +97,14 @@ export default function ReviewResults() {
         )}
       </div>
       {/* --- END OF METRICS BLOCK --- */}
+
+      {/* --- AUTO-GENERATED DOCUMENTATION SECTION --- */}
+      {review?.documentation && (
+        <div className="border rounded p-4 bg-gray-50 mb-6 prose prose-sm max-w-none">
+          <h2 className="font-semibold mb-2 not-prose text-lg text-gray-800">Auto-Generated Documentation</h2>
+          <ReactMarkdown>{review.documentation}</ReactMarkdown>
+        </div>
+      )}
 
       {/* --- FINDINGS LIST --- */}
       <h2 className="text-xl font-bold mb-3 mt-6">Code Findings</h2>

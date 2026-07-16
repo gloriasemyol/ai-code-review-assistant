@@ -2,7 +2,7 @@ const express = require('express');
 const router = express.Router();
 const supabase = require('../config/supabaseClient');
 const { analyzeJavaScript } = require('../services/eslintAnalyzer');
-const { analyzeCodeWithAI } = require('../services/aiAnalyzer'); // Matches the exported function name!
+const { analyzeCodeWithAI, generateDocumentation } = require('../services/aiAnalyzer');
 const { analyzeComplexity } = require('../services/complexityAnalyzer');
 
 router.post('/', async (req, res) => {
@@ -27,16 +27,19 @@ router.post('/', async (req, res) => {
     if (projectError) return res.status(400).json({ error: projectError.message });
     const project = projectData[0];
 
+    // Prepare analysis promises
     const staticAnalysisPromise = language === 'javascript'
       ? analyzeJavaScript(code_content)
       : Promise.resolve([]);
 
-    // Triggers the corrected service function
     const aiAnalysisPromise = analyzeCodeWithAI(code_content, language);
+    const docsPromise = generateDocumentation(code_content, language);
 
-    const [staticFindings, aiResult] = await Promise.all([
+    // Resolve all promises concurrently
+    const [staticFindings, aiResult, documentation] = await Promise.all([
       staticAnalysisPromise,
       aiAnalysisPromise,
+      docsPromise,
     ]);
 
     // Complexity analysis (JavaScript only for now)
@@ -44,11 +47,13 @@ router.post('/', async (req, res) => {
       ? analyzeComplexity(code_content)
       : null;
 
+    // Combine static analysis issues and AI findings
     const allFindings = [
       ...staticFindings.map((f) => ({ ...f, file_name })),
       ...(aiResult.findings || []).map((f) => ({ ...f, file_name })),
     ];
 
+    // Insert review, including the generated documentation string
     const { data: reviewData, error: reviewError } = await supabase
       .from('reviews')
       .insert([{
@@ -57,12 +62,14 @@ router.post('/', async (req, res) => {
         overall_score: aiResult.overall_score ?? null,
         summary: aiResult.summary || `Static: ${staticFindings.length} issue(s) found.`,
         complexity_metrics: complexityMetrics,
+        documentation: documentation, // Newly added field
       }])
       .select();
 
     if (reviewError) return res.status(400).json({ error: reviewError.message });
     const review = reviewData[0];
 
+    // Batch insert findings if there are any
     if (allFindings.length > 0) {
       const findingsToInsert = allFindings.map((f) => ({
         review_id: review.id,

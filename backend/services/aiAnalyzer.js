@@ -37,13 +37,13 @@ async function analyzeCodeWithAI(codeContent) {
     if (GoogleGenAI) {
       const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
       const response = await ai.models.generateContent({
-        model: "gemini-3.5-flash", // Updated to the active Gemini 3.5 API model
+        model: "gemini-3.5-flash",
         contents: prompt,
       });
       textResponse = response.text;
     } else if (GoogleGenerativeAI) {
       const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
-      const model = genAI.getGenerativeModel({ model: "gemini-3.5-flash" }); // Updated to the active Gemini 3.5 API model
+      const model = genAI.getGenerativeModel({ model: "gemini-3.5-flash" });
       const response = await model.generateContent(prompt);
       textResponse = response.text;
     } else {
@@ -71,4 +71,56 @@ async function analyzeCodeWithAI(codeContent) {
   }
 }
 
-module.exports = { analyzeCodeWithAI };
+async function generateDocumentation(codeString, language) {
+  const prompt = `
+    You are a technical writer creating documentation for a codebase.
+    Write clear documentation for the following ${language} code, in Markdown format.
+
+    Include:
+    - A one-paragraph overview of what this file does
+    - A bullet list describing each function/class: its purpose, parameters, and what it returns
+    - Any notable assumptions or edge cases a new developer should know about
+
+    Keep it concise and skip any function that is trivial (like a one-line getter).
+    Return ONLY the Markdown text, nothing else (no JSON, no extra commentary).
+
+    Code:
+    \`\`\`${language}
+    ${codeString}
+    \`\`\`
+  `;
+
+  try {
+    // Safety check for missing API Key
+    if (!process.env.GEMINI_API_KEY) {
+      throw new Error("GEMINI_API_KEY is missing from your .env file");
+    }
+
+    let textResponse = "";
+
+    // Automatically use the correct syntax based on which package you have installed
+    if (GoogleGenAI) {
+      const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
+      const response = await ai.models.generateContent({
+        model: "gemini-3.5-flash", // Updated to matching active model version
+        contents: prompt,
+      });
+      textResponse = response.text;
+    } else if (GoogleGenerativeAI) {
+      const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
+      const model = genAI.getGenerativeModel({ model: "gemini-3.5-flash" }); // Updated to matching active model version
+      const response = await model.generateContent(prompt);
+      textResponse = response.text;
+    } else {
+      throw new Error("No Google Gemini SDK libraries found.");
+    }
+
+    return textResponse.trim();
+  } catch (error) {
+    console.error("Documentation generation error:", error);
+    return "Documentation could not be generated for this submission.";
+  }
+}
+
+// Export both functions safely together
+module.exports = { analyzeCodeWithAI, generateDocumentation };
