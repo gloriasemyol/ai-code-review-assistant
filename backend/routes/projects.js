@@ -11,6 +11,13 @@ router.post('/', async (req, res) => {
     return res.status(400).json({ error: 'No code was submitted' });
   }
 
+  if (!user_id) {
+  return res.status(400).json({ error: 'You must be logged in to submit code.' });
+}
+if (code_content.length > 20000) {
+  return res.status(400).json({ error: 'Code submission is too large (max 20,000 characters). Try a smaller file.' });
+}
+
   // --- UUID SAFETY NET CHANGER ---
   let activeUserId = user_id;
   if (activeUserId === "test-user-123" || !activeUserId) {

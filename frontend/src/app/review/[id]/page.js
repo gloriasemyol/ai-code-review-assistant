@@ -30,12 +30,17 @@ export default function ReviewResults() {
       const res = await fetch(`http://localhost:5000/api/reviews/project/${id}`);
       const data = await res.json();
       
+      if (res.status === 404) {
+        setError("This review doesn't exist or has been deleted.");
+        return;
+      }
+      
       if (!res.ok) throw new Error(data.error);
       
       setReview(data.review);
       setFindings(data.findings || []);
     } catch (err) {
-      setError(err.message);
+      setError(err.message || "Something went wrong loading this review.");
     } finally {
       setLoading(false);
     }
