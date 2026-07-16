@@ -2,13 +2,8 @@
 const nextConfig = {
   reactCompiler: true,
   
-  eslint: {
-    // Allows production builds to successfully complete even if
-    // your project has minor ESLint or code style warnings.
-    ignoreDuringBuilds: true,
-  },
   typescript: {
-    // Prevents strict type-checking warnings from killing the Vercel build
+    // Prevents strict type-checking warnings from halting your build
     ignoreBuildErrors: true,
   },
 };
