@@ -1,11 +1,22 @@
-/** @type {import('next').NextConfig} */
-const nextConfig = {
-  reactCompiler: true,
-  
-  typescript: {
-    // Prevents strict type-checking warnings from halting your build
-    ignoreBuildErrors: true,
+{
+  "compilerOptions": {
+    "target": "es5",
+    "lib": ["dom", "dom.iterable", "esnext"],
+    "allowJs": true,
+    "skipLibCheck": true,
+    "strict": false,
+    "noEmit": true,
+    "esModuleInterop": true,
+    "module": "esnext",
+    "moduleResolution": "node",
+    "resolveJsonModule": true,
+    "isolatedModules": true,
+    "jsx": "preserve",
+    "incremental": true,
+    "baseUrl": ".",
+    "paths": {
+      "@/*": ["./src/*"]
+    }
   },
-};
-
-export default nextConfig;
+  "exclude": ["node_modules"]
+}
