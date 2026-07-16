@@ -11,7 +11,10 @@
   "license": "ISC",
   "type": "commonjs",
   "dependencies": {
+    "@google/genai": "^2.11.0",
     "@supabase/supabase-js": "^2.110.4",
+    "acorn": "^8.17.0",
+    "acorn-walk": "^8.3.5",
     "cors": "^2.8.6",
     "dotenv": "^17.4.2",
     "eslint": "^8.57.0",
