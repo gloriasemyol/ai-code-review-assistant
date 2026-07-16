@@ -1,6 +1,5 @@
 'use client';
 import { useState } from 'react';
-import { useAuth } from '../context/AuthContext';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 
@@ -9,19 +8,37 @@ export default function NewReviewPage() {
   const [analyzing, setAnalyzing] = useState(false);
   const router = useRouter();
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = (e) => {
     e.preventDefault();
     if (!code.trim()) return alert("Please paste some code first!");
     
     setAnalyzing(true);
 
-    // Simulate sending code to backend
+    // Simulate analysis delay
     setTimeout(() => {
       setAnalyzing(false);
-      // Generate a random ID for this review session
       const mockReviewId = Math.floor(100000 + Math.random() * 900000);
+      
+      // Save to localStorage history
+      const newReview = {
+        id: mockReviewId,
+        date: new Date().toLocaleDateString(undefined, {
+          month: 'short',
+          day: 'numeric',
+          year: 'numeric',
+          hour: '2-digit',
+          minute: '2-digit'
+        }),
+        title: code.trim().substring(0, 35) + (code.trim().length > 35 ? '...' : ''),
+        codeSnippet: code
+      };
+
+      const existingHistory = JSON.parse(localStorage.getItem('codeReviews') || '[]');
+      localStorage.setItem('codeReviews', JSON.stringify([newReview, ...existingHistory]));
+
+      // Redirect to results
       router.push(`/review/${mockReviewId}`);
-    }, 2000); // 2 seconds simulated analysis time
+    }, 1500);
   };
 
   return (
