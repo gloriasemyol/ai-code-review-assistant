@@ -1,5 +1,4 @@
 'use client';
-import Link from 'next from "next/link"'; // Standard Next.js Link
 import Link from 'next/link';
 import { useAuth } from '../context/AuthContext';
 
